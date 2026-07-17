@@ -161,11 +161,79 @@
 
   });
 
+
+  
+
   /**
    * Initiate glightbox
    */
   const glightbox = GLightbox({
     selector: '.glightbox'
+  });
+
+  // Inline scripts moved from home.blade.php
+  document.addEventListener('DOMContentLoaded', function () {
+    // Timeline toggle (shows only maxVisible items)
+    try {
+      var timeline = document.querySelector('.timeline[data-max-visible]');
+      if (timeline) {
+        var maxVisible = parseInt(timeline.dataset.maxVisible, 10) || 4;
+        var items = Array.from(timeline.querySelectorAll('.timeline-item'));
+        var toggle = document.querySelector('.timeline-toggle');
+        if (!toggle || items.length <= maxVisible) {
+          if (toggle) toggle.style.display = 'none';
+        } else {
+          function updateItems(expanded) {
+            items.forEach(function (item, index) {
+              if (index >= maxVisible) {
+                item.classList.toggle('timeline-item-hidden', !expanded);
+              }
+            });
+            toggle.textContent = expanded ? 'Pokaż mniej' : 'Pokaż więcej';
+            toggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+          }
+          updateItems(false);
+          toggle.addEventListener('click', function () {
+            var expanded = toggle.getAttribute('aria-expanded') === 'true';
+            updateItems(!expanded);
+            if (expanded) {
+              timeline.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          });
+        }
+      }
+    } catch (e) {
+      console.error('Timeline init error', e);
+    }
+
+    // Lightbox handlers
+    try {
+      var lightbox = document.getElementById('lightbox');
+      var lightboxImage = document.getElementById('lightbox-image');
+      if (lightbox && lightboxImage) {
+        window.openLightbox = function (element) {
+          var img = element.querySelector('img');
+          if (!img) return;
+          lightboxImage.src = img.src;
+          lightbox.style.display = 'flex';
+          document.body.style.overflow = 'hidden';
+        };
+
+        window.closeLightbox = function (event) {
+          if (event && event.target.id !== 'lightbox') return;
+          lightbox.style.display = 'none';
+          document.body.style.overflow = 'auto';
+        };
+
+        document.addEventListener('keydown', function (event) {
+          if (event.key === 'Escape') {
+            window.closeLightbox();
+          }
+        });
+      }
+    } catch (e) {
+      console.error('Lightbox init error', e);
+    }
   });
 
 })();

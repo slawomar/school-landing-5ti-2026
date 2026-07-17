@@ -23,6 +23,7 @@
   <link href="{{ asset('college/assets/vendor/aos/aos.css') }}" rel="stylesheet">
   <link href="{{ asset('college/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
   <link href="{{ asset('college/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+  
 
   <!-- Main CSS File -->
   <link href="{{ asset('college/assets/css/main.css') }}" rel="stylesheet">
