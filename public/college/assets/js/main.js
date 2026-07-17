@@ -164,12 +164,45 @@
 
   
 
+  // ... (wcześniejszy kod bez zmian) ...
+
   /**
    * Initiate glightbox
    */
   const glightbox = GLightbox({
     selector: '.glightbox'
   });
+
+  // DEFINIUJEMY FUNKCJE GLOBALNE NATYCHMIAST (dla bezpiecznego onclick w HTML)
+  try {
+    window.openLightbox = function (element) {
+      var lightboxImage = document.getElementById('lightbox-image');
+      var lightbox = document.getElementById('lightbox');
+      if (!lightbox || !lightboxImage) return;
+      
+      var img = element.querySelector('img');
+      if (!img) return;
+      lightboxImage.src = img.src;
+      lightbox.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    };
+
+    window.closeLightbox = function (event) {
+      var lightbox = document.getElementById('lightbox');
+      if (!lightbox) return;
+      if (event && event.target.id !== 'lightbox' && event.type !== 'keydown') return;
+      lightbox.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    };
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        window.closeLightbox();
+      }
+    });
+  } catch (e) {
+    console.error('Lightbox global init error', e);
+  }
 
   // Inline scripts moved from home.blade.php
   document.addEventListener('DOMContentLoaded', function () {
@@ -204,35 +237,6 @@
       }
     } catch (e) {
       console.error('Timeline init error', e);
-    }
-
-    // Lightbox handlers
-    try {
-      var lightbox = document.getElementById('lightbox');
-      var lightboxImage = document.getElementById('lightbox-image');
-      if (lightbox && lightboxImage) {
-        window.openLightbox = function (element) {
-          var img = element.querySelector('img');
-          if (!img) return;
-          lightboxImage.src = img.src;
-          lightbox.style.display = 'flex';
-          document.body.style.overflow = 'hidden';
-        };
-
-        window.closeLightbox = function (event) {
-          if (event && event.target.id !== 'lightbox') return;
-          lightbox.style.display = 'none';
-          document.body.style.overflow = 'auto';
-        };
-
-        document.addEventListener('keydown', function (event) {
-          if (event.key === 'Escape') {
-            window.closeLightbox();
-          }
-        });
-      }
-    } catch (e) {
-      console.error('Lightbox init error', e);
     }
   });
 
