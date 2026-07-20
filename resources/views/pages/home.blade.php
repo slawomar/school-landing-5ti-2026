@@ -238,6 +238,10 @@
        <h2>Galeria</h2>
        <p>Poznaj naszą szkołę poprzez fotografie z życia szkolnego</p>
      </div><!-- End Section Title -->
+    @php
+    use Carbon\Carbon;
+    $newest_photos = DB::table('newest_photos')->get(); 
+    @endphp
 
      <div class="container" data-aos="fade-up" data-aos-delay="100">
        <div class="row justify-content-center">
@@ -245,67 +249,72 @@
            <div class="row g-4">
              <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
                <div class="gallery-item-wrapper">
+                 <span class="label-card-title">{{ $newest_photos[0]->description }}</span>
                  <div class="gallery-item" style="cursor: pointer;" onclick="openLightbox(this)">
-                   <img src="{{ asset('college/assets/img/blog/blog-post-1.webp') }}" alt="Gallery" class="img-fluid">
+                    <img src="{{ asset($newest_photos[0]->path) }}" alt="{{ $newest_photos[0]->description }}" class="img-fluid">
                    <div class="gallery-overlay">
                      <i class="bi bi-plus"></i>
                    </div>
                  </div>
-                 <p class="gallery-date">15 lipca 2026</p>
+                  <span class="label-card-title">{{ Carbon::parse($newest_photos[0]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
 
              <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="150">
                <div class="gallery-item-wrapper">
+                  <span class="label-card-title">{{ $newest_photos[1]->description }}</span>
                  <div class="gallery-item" style="cursor: pointer;" onclick="openLightbox(this)">
-                   <img src="{{ asset('college/assets/img/blog/blog-post-square-1.webp') }}" alt="Gallery" class="img-fluid">
+                    <img src="{{ asset($newest_photos[1]->path) }}" alt="{{ $newest_photos[1]->description }}" class="img-fluid">
                    <div class="gallery-overlay">
                      <i class="bi bi-plus"></i>
                    </div>
                  </div>
-                 <p class="gallery-date">12 lipca 2026</p>
+                 <span class="label-card-title">{{ Carbon::parse($newest_photos[1]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
 
              <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="200">
                <div class="gallery-item-wrapper">
+                  <span class="label-card-title">{{ $newest_photos[2]->description }}</span>
                  <div class="gallery-item" style="cursor: pointer;" onclick="openLightbox(this)">
-                   <img src="{{ asset('college/assets/img/blog/blog-post-square-2.webp') }}" alt="Gallery" class="img-fluid">
+                   <img src="{{ asset($newest_photos[2]->path) }}" alt="{{ $newest_photos[2]->description }}" class="img-fluid">
                    <div class="gallery-overlay">
                      <i class="bi bi-plus"></i>
                    </div>
                  </div>
-                 <p class="gallery-date">10 lipca 2026</p>
+                 <span class="label-card-title">{{ Carbon::parse($newest_photos[2]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
 
              <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="250">
                <div class="gallery-item-wrapper">
+                  <span class="label-card-title">{{ $newest_photos[3]->description }}</span>
                  <div class="gallery-item" style="cursor: pointer;" onclick="openLightbox(this)">
-                   <img src="{{ asset('college/assets/img/blog/blog-post-square-3.webp') }}" alt="Gallery" class="img-fluid">
+                   <img src="{{ asset($newest_photos[3]->path) }}" alt="{{ $newest_photos[3]->description }}" class="img-fluid">
                    <div class="gallery-overlay">
                      <i class="bi bi-plus"></i>
                    </div>
                  </div>
-                 <p class="gallery-date">8 lipca 2026</p>
+                 <span class="label-card-title">{{ Carbon::parse($newest_photos[3]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
 
              <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="300">
                <div class="gallery-item-wrapper">
+                  <span class="label-card-title">{{ $newest_photos[4]->description }}</span>
                  <div class="gallery-item" style="cursor: pointer;" onclick="openLightbox(this)">
-                   <img src="{{ asset('college/assets/img/blog/blog-post-square-4.webp') }}" alt="Gallery" class="img-fluid">
+                   <img src="{{ asset($newest_photos[4]->path) }}" alt="{{ $newest_photos[4]->description }}" class="img-fluid">
                    <div class="gallery-overlay">
                      <i class="bi bi-plus"></i>
                    </div>
                  </div>
-                 <p class="gallery-date">5 lipca 2026</p>
+                 <span class="label-card-title">{{ Carbon::parse($newest_photos[4]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
            </div>
 
-           <div class="text-center mt-5" data-aos="fade-up" data-aos-delay="350">
-             <a href="#" class="btn btn-primary">Pełna galeria</a>
+           <div class="text-center mt-5">
+             <a href="{{ route('gallery') }}" class="btn btn-primary">Pełna galeria</a>
            </div>
          </div>
        </div>
