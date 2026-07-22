@@ -28,7 +28,7 @@
                     <div class="gallery-item-wrapper">
                         <span class="label-card-title">{{ $photo->description }}</span>
                         <div class="gallery-item" style="cursor: pointer;" onclick="openLightbox(this)">
-                            <img src="{{ asset($photo->path) }}" alt="{{ $photo->description }}" class="img-fluid">
+                            <img src="{{ asset(ltrim($photo->path ?? '', '/')) }}" alt="{{ $photo->description }}" class="img-fluid">
                             <div class="gallery-overlay">
                                 <i class="bi bi-plus"></i>
                             </div>
