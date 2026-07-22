@@ -13,7 +13,6 @@ return new class extends Migration
             ORDER BY updated_at DESC
             LIMIT 5
         ");
-
             DB::statement("
                 CREATE VIEW IF NOT EXISTS newest_labels AS  
 WITH ranked_labels AS (
@@ -40,7 +39,6 @@ WHERE
 ORDER BY 
     latest_updated_at DESC;
             ");
-        
     }
 
 
