@@ -64,6 +64,61 @@
   scroll-behavior: smooth;
 }
 
+
+.contact-block {
+  border-left: 3px solid #2563eb;
+  padding-left: 12px;
+  font-family: sans-serif;
+  margin-bottom: 16px;
+  margin-right: 24px;
+}
+
+.block-label {
+  text-transform: uppercase;
+  color: #2563eb;
+  font-weight: bold;
+  font-size: 11px;
+  display: block;
+}
+
+.block-title {
+  margin: 2px 0 6px 0;
+  font-size: 16px;
+  color: #111827;
+}
+
+.block-text {
+  margin: 4px 0 0 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #374151;
+}
+
+.contact-link {
+  color: blue;
+  text-decoration: none;
+}
+
+.contact-link:hover {
+  text-decoration: underline;
+}
+
+.mono-text {
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+.contact-simple {
+  font-family: sans-serif;
+  font-size: 14px;
+  color: #374151;
+}
+
+.contact-simple strong {
+  color: #2563eb;
+  font-size: 22px;
+  text-transform: uppercase;
+}
+
+
 /*--------------------------------------------------------------
 # General Styling & Shared Classes
 --------------------------------------------------------------*/

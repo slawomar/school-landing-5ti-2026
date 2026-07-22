@@ -67,7 +67,7 @@
               <li><a href="#">OPW (Oddziały Przygotowania Wojskowego)</a></li>
             </ul>
           </li>
-          <li><a href="#">Kontakt</a></li>
+          <li><a href="{{ route('contact') }}">Kontakt</a></li>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>

@@ -33,7 +33,6 @@
                                 <i class="bi bi-plus"></i>
                             </div>
                         </div>
-                        <span class="label-card-title">{{ Carbon::parse($photo->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                     </div>
                 </li>
             @endforeach
@@ -48,5 +47,11 @@
         </button>
       </div>
     </div>
+    <div class="d-flex justify-content-center my-5">
+  <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
+    &leftarrow; Powrót
+  </a>
+</div>
+    
 </main>
 @endsection
