@@ -13,44 +13,34 @@ return new class extends Migration
             ORDER BY updated_at DESC
             LIMIT 5
         ");
-        $driver = DB::getDriverName();
 
-        if ($driver === 'sqlite') {
-            // Składnia dla SQLite
             DB::statement("
                 CREATE VIEW IF NOT EXISTS newest_labels AS  
-                SELECT  
-                    j.value AS label,  
-                    MAX(i.updated_at) AS latest_updated_at,  
-                    i.path AS path  
-                FROM  
-                    photos i,  
-                    json_each(i.labels) j  
-                GROUP BY  
-                    j.value  
-                ORDER BY  
-                    latest_updated_at DESC
+WITH ranked_labels AS (
+    SELECT 
+        j.value AS label,
+        i.updated_at AS latest_updated_at,
+        i.path AS path,
+        ROW_NUMBER() OVER (PARTITION BY j.value ORDER BY i.updated_at DESC) AS rn
+    FROM 
+        photos i,
+        JSON_TABLE(
+            i.labels, 
+            '$[*]' COLUMNS (value VARCHAR(255) PATH '$')
+        ) AS j
+)
+SELECT 
+    label, 
+    latest_updated_at, 
+    path
+FROM 
+    ranked_labels
+WHERE 
+    rn = 1
+ORDER BY 
+    latest_updated_at DESC;
             ");
-        } else {
-            // Składnia dla MariaDB / MySQL
-            DB::statement("
-                CREATE VIEW IF NOT EXISTS newest_labels AS  
-                SELECT  
-                    j.value AS label,  
-                    MAX(i.updated_at) AS latest_updated_at,  
-                    i.path AS path  
-                FROM  
-                    photos i,  
-                    JSON_TABLE(
-                        i.labels, 
-                        '$[*]' COLUMNS (value VARCHAR(255) PATH '$')
-                    ) AS j  
-                GROUP BY  
-                    j.value  
-                ORDER BY  
-                    latest_updated_at DESC
-            ");
-        }
+        
     }
 
 
