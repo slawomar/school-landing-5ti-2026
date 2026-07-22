@@ -22,7 +22,7 @@
               <h5>Branżowa Szkoła I stopnia im. M. Kopernika</h5>
              <br>
              <div class="action-buttons">
-               <a href="#" class="btn-primary">Rekrutacja 2026/27</a>
+               <a href="{{ route('recruitment') }}" class="btn-primary">Rekrutacja 2026/27</a>
                <a href="#" class="btn-secondary">Kalendarium</a>
              </div>
            </div>
@@ -33,6 +33,16 @@
      
 
    </section><!-- /Hero Section -->
+
+   @php
+    use Carbon\Carbon;
+    use Illuminate\Support\Facades\DB;
+
+    $articles = DB::table('articles')
+        ->orderByDesc('updated_at')
+        ->limit(4)
+        ->get(); 
+@endphp
 
 <section id="recent-news" class="recent-news section">
 
@@ -48,25 +58,23 @@
          <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
            <article class="post-item d-flex">
              <div class="post-img">
-               <img src="{{ asset('college/assets/img/education/remont_ZS2026.jpeg') }}" alt="">
+               <img src="{{ asset($articles[0]->thumbnail) }}" alt="">
              </div>
 
              <div class="post-content flex-grow-1">
-               <p class="category">Komunikat</p>
-
+               <p class="category">{{ $articles[0]->category }}</p>
                <h2 class="post-title">
-                 <a href="#">Uwaga! trwają prace remontowe</a>
-               </h2>
+                  <a href="{{ route('articles.show', $articles[0]->slug) }}">
+                      {{ $articles[0]->title }}
+                  </a>
+              </h2>
 
                <p class="post-description">
-                
+                {{ $articles[0]->description }}
                </p>
 
                <div class="post-meta">
-                 <div class="post-author">
-                   <span class="author-name">Redaktor</span>
-                 </div>
-                 <span class="post-date">2026/07/01</span>
+                 <span class="post-date">{{ Carbon::parse($articles[0]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
            </article>
@@ -75,25 +83,47 @@
          <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
            <article class="post-item d-flex">
              <div class="post-img">
-               <img src="{{ asset('college/assets/img/education/BANER BT_2026_FB.png') }}" alt="">
+               <img src="{{ asset($articles[1]->thumbnail) }}" alt="">
              </div>
 
              <div class="post-content flex-grow-1">
-               <p class="category">Rekrutacja</p>
-
+               <p class="category">{{ $articles[1]->category }}</p>
                <h2 class="post-title">
-                 <a href="#">Rekrutacja 2026</a>
-               </h2>
+                  <a href="{{ route('articles.show', $articles[1]->slug) }}">
+                      {{ $articles[1]->title }}
+                  </a>
+              </h2>
 
                <p class="post-description">
-                
+                {{ $articles[1]->description }}
                </p>
 
                <div class="post-meta">
-                 <div class="post-author">
-                   <span class="author-name">Redaktor</span>
-                 </div>
-                 <span class="post-date">2026/03/24</span>
+                 <span class="post-date">{{ Carbon::parse($articles[1]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
+               </div>
+             </div>
+           </article>
+         </div><!-- End post item -->
+         <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
+           <article class="post-item d-flex">
+             <div class="post-img">
+               <img src="{{ asset($articles[2]->thumbnail) }}" alt="">
+             </div>
+
+             <div class="post-content flex-grow-1">
+               <p class="category">{{ $articles[2]->category }}</p>
+               <h2 class="post-title">
+                  <a href="{{ route('articles.show', $articles[2]->slug) }}">
+                      {{ $articles[2]->title }}
+                  </a>
+              </h2>
+
+               <p class="post-description">
+                {{ $articles[2]->description }}
+               </p>
+
+               <div class="post-meta">
+                 <span class="post-date">{{ Carbon::parse($articles[2]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
            </article>
@@ -102,64 +132,36 @@
          <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
            <article class="post-item d-flex">
              <div class="post-img">
-               <img src="{{ asset('college/assets/img/education/kopernik_datek.jpg') }}" alt="">
+               <img src="{{ asset($articles[3]->thumbnail) }}" alt="">
              </div>
 
              <div class="post-content flex-grow-1">
-               <p class="category">Ogłoszenie</p>
-
+               <p class="category">{{ $articles[3]->category }}</p>
                <h2 class="post-title">
-                 <a href="#">Przekaż 1,5% na sportowe wyposażenie naszej Szkoły</a>
-               </h2>
+                  <a href="{{ route('articles.show', $articles[3]->slug) }}">
+                      {{ $articles[3]->title }}
+                  </a>
+              </h2>
 
                <p class="post-description">
-                
+                {{ $articles[3]->description }}
                </p>
 
                <div class="post-meta">
-                 <div class="post-author">
-                   <span class="author-name">Redaktor</span>
-                 </div>
-                 <span class="post-date">2026/03/01</span>
+                 <span class="post-date">{{ Carbon::parse($articles[3]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
                </div>
              </div>
            </article>
          </div><!-- End post item -->
 
-         <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
-           <article class="post-item d-flex">
-             <div class="post-img">
-               <img src="{{ asset('college/assets/img/education/dzien-nauki-kopernik.png') }}" alt="">
-             </div>
-
-             <div class="post-content flex-grow-1">
-               <p class="category">Komunikat</p>
-
-               <h2 class="post-title">
-                 <a href="#">19 lutego dzień urodzin Naszego Patrona</a>
-               </h2>
-
-               <p class="post-description">
-                19 lutego – urodziny Mikołaja Kopernika i Dzień Nauki Polskiej
-               </p>
-
-               <div class="post-meta">
-                 <div class="post-author">
-                   <span class="author-name">Redaktor</span>
-                 </div>
-                 <span class="post-date">2026/02/19</span>
-               </div>
-             </div>
-           </article>
-         </div><!-- End post item -->
-
-      <a href="#" class="btn btn-primary mt-4">Zobacz wszystkie aktualności</a>
+      <a href="{{ route('articles') }}" class="btn btn-primary mt-4">Zobacz wszystkie aktualności</a>
 
        </div>
 
      </div>
 
    </section><!-- /Recent News Section -->
+   
 
 
    <!-- About Section -->
@@ -239,7 +241,6 @@
        <p>Poznaj naszą szkołę poprzez fotografie z życia szkolnego</p>
      </div><!-- End Section Title -->
     @php
-    use Carbon\Carbon;
     $newest_photos = DB::table('newest_photos')->get(); 
     @endphp
 
