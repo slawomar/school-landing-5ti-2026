@@ -235,11 +235,11 @@
 
  
 
-   <a href="{{ route('articles') }}" class="btn btn-primary mt-4">Zobacz wszystkie aktualności</a>
+   <a href="{{ route('articles.index') }}" class="btn btn-primary mt-4">Zobacz wszystkie aktualności</a>
 
 @if(auth()->check() && auth()->user()->hasMinRole('editor'))
 
-<a href="{{ route('add-article') }}" class="btn btn-success">
+<a href="{{ route('articles.create') }}" class="btn btn-success">+ Dodaj artykuł</a>
 
 + Dodaj artykuł
 
