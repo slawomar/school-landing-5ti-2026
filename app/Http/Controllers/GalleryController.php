@@ -10,12 +10,11 @@ use Illuminate\Support\Str;
 class GalleryController extends Controller
 {
     public function index(Request $request)
-    {
-        $slug = $request->query('slug');
+{
+    $slug = $request->query('slug');
+    $query = DB::table('photos');
 
-$query = DB::table('photos');
-
-if ($slug) {
+    if ($slug) {
     $query->whereRaw("EXISTS (
         SELECT 1 
         FROM JSON_TABLE(photos.labels, '$[*]' COLUMNS (val VARCHAR(500) PATH '$')) AS j 
@@ -47,10 +46,10 @@ if ($slug) {
     )", [$slug]);
 }
 
-$all_photos = $query->orderBy('updated_at', 'desc')->get();
+    $all_photos = $query->orderBy('updated_at', 'desc')->get();
 
-        return view('pages.gallery2', compact('all_photos'));
-    }
+    return view('pages.gallery2', compact('all_photos'));
+}
     public function create()
     {
         if (!auth()->check() || !auth()->user()->hasMinRole('editor')) {
@@ -100,27 +99,55 @@ $all_photos = $query->orderBy('updated_at', 'desc')->get();
         return redirect()->route('gallery.store')->with('success', 'Nowy label oraz zdjęcia zostały pomyślnie dodane!');
     }
     public function edit($slug)
-    {
-        if (!auth()->check() || !auth()->user()->hasMinRole('editor')) {
-            abort(403);
-        }
-
-        $labelData = DB::table('newest_labels')->where('slug', $slug)->first();
-
-        if (!$labelData) {
-            abort(404);
-        }
-
-        $photos = DB::table('photos')
-            ->whereJsonContains('labels', $labelData->label)
-            ->get();
-
-        return view('pages.gallery-edit', [
-            'label'  => $labelData->label,
-            'slug'   => $slug,
-            'photos' => $photos
-        ]);
+{
+    if (!auth()->check() || !auth()->user()->hasMinRole('editor')) {
+        abort(403);
     }
+
+    // Pobieramy zdjęcia dopasowane po slugu
+    $photos = DB::table('photos')
+        ->whereRaw("
+            LOWER(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                REPLACE(
+                    JSON_UNQUOTE(JSON_EXTRACT(photos.labels, '$[0]')),
+                    ' ', '-'),
+                    'ą', 'a'), 'ć', 'c'), 'ę', 'e'), 'ł', 'l'), 'ń', 'n'), 'ó', 'o'), 'ś', 's'), 'ź', 'z'), 'ż', 'z'),
+                    'Ą', 'a'), 'Ć', 'c'), 'Ę', 'e'), 'Ł', 'l'), 'Ń', 'n'), 'Ó', 'o'), 'Ś', 's'), 'Ź', 'z'), 'Ż', 'z')
+            ) = ?
+        ", [$slug])
+        ->get();
+
+    if ($photos->isEmpty()) {
+        abort(404);
+    }
+
+    $firstPhotoLabels = json_decode($photos->first()->labels, true);
+    $labelName = is_array($firstPhotoLabels) ? $firstPhotoLabels[0] : $photos->first()->labels;
+
+    return view('pages.gallery-edit', [
+        'label'  => $labelName,
+        'slug'   => $slug,
+        'photos' => $photos
+    ]);
+}
 
     public function update(Request $request, $slug)
     {
