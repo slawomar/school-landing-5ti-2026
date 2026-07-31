@@ -9,6 +9,7 @@
     @php
         use Illuminate\Support\Facades\DB;
         use Carbon\Carbon;
+        use Illuminate\Support\Str;
 
         $dateFrom = request('from');
         $dateTo = request('to');
@@ -49,13 +50,16 @@
     <div class="labels">
         <ul>
             @foreach ($labels as $label)
+                @php
+                    $generatedSlug = $label->slug ?? Str::slug($label->label ?? '');
+                @endphp
                 <li>
                     @if(auth()->check() && auth()->user()->hasMinRole('editor'))
-                <a href="{{ route('gallery.edit', $label->slug) }}" class="btn btn-sm btn-warning mb-2">
-                    Edytuj album
-                </a>
-            @endif
-                    <a href="/gallery2?slug={{ $label->slug ?? \Illuminate\Support\Str::slug($label->label ?? $label) }}" class="label-card-link">
+                        <a href="{{ route('gallery.edit', $generatedSlug) }}" class="btn btn-sm btn-warning mb-2">
+                            Edytuj album
+                        </a>
+                    @endif
+                    <a href="/gallery2?slug={{ $generatedSlug }}" class="label-card-link">
                         <div class="gallery-item-wrapper">
                             <span class="label-card-title">{{ $label->label }}</span>
                             <div class="gallery-item">
@@ -68,18 +72,20 @@
             @endforeach
         </ul>
     </div>
+
     @if(auth()->check() && auth()->user()->hasMinRole('editor'))
-    <div class="mb-4 text-end">
-        <a href="{{ route('gallery.create') }}" class="btn btn-success">
-            + Dodaj nowy album
+        <div class="mb-4 text-end">
+            <a href="{{ route('gallery.create') }}" class="btn btn-success">
+                + Dodaj nowy album
+            </a>
+        </div>
+    @endif
+
+    <div class="d-flex justify-content-center my-5">
+        <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
+            &leftarrow; Powrót
         </a>
     </div>
-@endif
-     <div class="d-flex justify-content-center my-5">
-  <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
-    &leftarrow; Powrót
-  </a>
-</div>
 
 </main>
 @endsection
