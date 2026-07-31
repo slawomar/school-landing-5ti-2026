@@ -55,7 +55,7 @@
                     Edytuj album
                 </a>
             @endif
-                    <a href="/gallery2?slug={{ $label->slug }}" class="label-card-link">
+                    <a href="/gallery2?slug={{ $label->slug ?? \Illuminate\Support\Str::slug($label->label ?? $label) }}" class="label-card-link">
                         <div class="gallery-item-wrapper">
                             <span class="label-card-title">{{ $label->label }}</span>
                             <div class="gallery-item">
