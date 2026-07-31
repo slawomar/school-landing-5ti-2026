@@ -8,7 +8,7 @@ use App\Http\Controllers\Auth\LoginController;
 
 // --- STRONY PUBLICZNE ---
 Route::view('/', 'pages.home')->name('home');
-Route::get('/gallery', [GalleryController::class, 'index'])->name('gallery');
+Route::view('/gallery', 'pages.gallery')->name('gallery');
 Route::get('/gallery2', [GalleryController::class, 'index'])->name('gallery2');
 Route::view('/contact', 'pages.contact')->name('contact');
 Route::view('/recruitment', 'pages.recruitment')->name('recruitment');
