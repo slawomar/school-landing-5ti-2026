@@ -5,7 +5,7 @@
 @section('content')
     <div class="container">
         <h1>Dodaj artykuł</h1>
-        <form action="{{ route('articles') }}" method="POST" enctype="multipart/form-data">
+       <form action="{{ route('articles.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label for="title">Tytuł</label>
