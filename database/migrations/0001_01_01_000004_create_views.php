@@ -18,6 +18,7 @@ return new class extends Migration
 WITH ranked_labels AS (
     SELECT 
         j.value AS label,
+        LOWER(REPLACE(j.value, ' ', '-')) AS slug, -- Tworzymy podstawowy slug
         i.updated_at AS latest_updated_at,
         i.path AS path,
         ROW_NUMBER() OVER (PARTITION BY j.value ORDER BY i.updated_at DESC) AS rn
@@ -30,6 +31,7 @@ WITH ranked_labels AS (
 )
 SELECT 
     label, 
+    slug,
     latest_updated_at, 
     path
 FROM 
