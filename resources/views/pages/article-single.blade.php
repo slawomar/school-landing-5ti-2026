@@ -7,7 +7,6 @@
 @section('content')
 <main class="main">
 
-  <!-- Sekcja nagłówkowa / Hero / Breadcrumbs (opcjonalnie) -->
   <div class="page-title py-4 bg-light mb-5">
     <div class="container d-lg-flex justify-content-between align-items-center">
       <h1 class="mb-2 mb-lg-0 fs-3">{{ $article->title }}</h1>
@@ -26,7 +25,6 @@
         
         <article class="article-details">
 
-          <!-- Kategoria i meta dane -->
           <div class="article-meta mb-3 d-flex align-items-center gap-3">
             <span class="badge bg-primary text-uppercase px-3 py-2 fs-6">{{ $article->category }}</span>
             <span class="text-muted small">
@@ -35,17 +33,14 @@
             </span>
           </div>
 
-          <!-- Główny Tytuł -->
           <h1 class="mb-4 display-6 fw-bold text-dark">{{ $article->title }}</h1>
 
-          <!-- Krótki opis / Wstęp (opcjonalny, jeśli chcesz wyróżnić lead) -->
           @if(isset($article->description))
             <p class="lead text-secondary mb-4 fs-5 fst-italic">
               {{ $article->description }}
             </p>
           @endif
 
-          <!-- Miniaturka / Zdjęcie główne (BEZ PRZYCINANIA) -->
           @if($article->thumbnail)
             <div class="article-thumbnail my-4 text-center">
               <img src="{{ asset($article->thumbnail) }}" 
@@ -57,14 +52,12 @@
 
           <hr class="my-4 opacity-25">
 
-          <!-- Pełna treść wpisu -->
           <div class="article-body lh-lg fs-5 text-secondary">
             {!! $article->content !!}
           </div>
 
           <hr class="my-5 opacity-25">
 
-          <!-- Nawigacja powrotu -->
           <div class="d-flex justify-content-between align-items-center">
             <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
               &leftarrow; Powrót

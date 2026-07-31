@@ -45,4 +45,24 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+    public const ROLES = [
+        'admin'     => 100,
+        'editor' => 80,
+        'teacher'    => 60,
+        'guest'     => 0,
+    ];
+
+
+    public function getRoleLevelAttribute(): int
+    {
+        return self::ROLES[$this->role] ?? 0;
+    }
+
+
+    public function hasMinRole(string $requiredRole): bool
+    {
+        $requiredLevel = self::ROLES[$requiredRole] ?? 0;
+        
+        return $this->role_level >= $requiredLevel;
+    }
 }

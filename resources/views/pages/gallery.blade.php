@@ -50,7 +50,12 @@
         <ul>
             @foreach ($labels as $label)
                 <li>
-                    <a href="/gallery2?label={{ urlencode($label->label ?? '') }}" class="label-card-link">
+                    @if(auth()->check() && auth()->user()->hasMinRole('editor'))
+                <a href="{{ route('gallery.edit', $label->slug) }}" class="btn btn-sm btn-warning mb-2">
+                    Edytuj album
+                </a>
+            @endif
+                    <a href="/gallery2?slug={{ $label->slug }}" class="label-card-link">
                         <div class="gallery-item-wrapper">
                             <span class="label-card-title">{{ $label->label }}</span>
                             <div class="gallery-item">
@@ -63,10 +68,18 @@
             @endforeach
         </ul>
     </div>
+    @if(auth()->check() && auth()->user()->hasMinRole('editor'))
+    <div class="mb-4 text-end">
+        <a href="{{ route('gallery.create') }}" class="btn btn-success">
+            + Dodaj nowy album
+        </a>
+    </div>
+@endif
      <div class="d-flex justify-content-center my-5">
   <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
     &leftarrow; Powrót
   </a>
 </div>
+
 </main>
 @endsection

@@ -10,6 +10,12 @@
 
 
  <section id="hero" class="hero section">
+  @if (session('success'))
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
+@endif
+
 
      <div class="hero-wrapper">
       <div style="display: flex; gap: 20px;">
@@ -46,119 +52,204 @@
 
 <section id="recent-news" class="recent-news section">
 
-     <!-- Section Title -->
-     <div class="container section-title" data-aos="fade-up">
-       <h2>Aktualności</h2>
-     </div><!-- End Section Title -->
+   <div class="container" data-aos="fade-up" data-aos-delay="100">
 
-     <div class="container" data-aos="fade-up" data-aos-delay="100">
+  <div class="row gy-4">
 
-       <div class="row gy-4">
+    <!-- ARTYKUŁ 1 -->
+    @if(isset($articles[0]))
+    <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
+      <article class="post-item d-flex">
+        <div class="post-img">
+          <img src="{{ asset($articles[0]->thumbnail) }}" alt="">
+        </div>
 
-         <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
-           <article class="post-item d-flex">
-             <div class="post-img">
-               <img src="{{ asset($articles[0]->thumbnail) }}" alt="">
-             </div>
+        <div class="post-content flex-grow-1">
+          <p class="category">{{ $articles[0]->category }}</p>
+          <h2 class="post-title">
+             <a href="{{ route('articles.show', $articles[0]->slug) }}">
+                 {{ $articles[0]->title }}
+             </a>
+         </h2>
 
-             <div class="post-content flex-grow-1">
-               <p class="category">{{ $articles[0]->category }}</p>
-               <h2 class="post-title">
-                  <a href="{{ route('articles.show', $articles[0]->slug) }}">
-                      {{ $articles[0]->title }}
-                  </a>
-              </h2>
+          <p class="post-description">
+           {{ $articles[0]->description }}
+          </p>
 
-               <p class="post-description">
-                {{ $articles[0]->description }}
-               </p>
+          <div class="post-meta">
+            <span class="post-date">{{ Carbon::parse($articles[0]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
+          </div>
 
-               <div class="post-meta">
-                 <span class="post-date">{{ Carbon::parse($articles[0]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
-               </div>
-             </div>
-           </article>
-         </div><!-- End post item -->
+          {{-- ODRĘBNY BLOK AKCJI DLA UPRAWNIONYCH --}}
+          @if(auth()->check() && auth()->user()->hasMinRole('editor'))
+            <div class="mt-2 pt-2 border-top d-flex gap-2">
+              <a href="{{ route('articles.edit', $articles[0]->slug) }}" class="btn btn-sm btn-warning">
+                Edytuj
+              </a>
+              <form action="{{ route('articles.destroy', $articles[0]->slug) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć ten artykuł?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger">
+                  Usuń
+                </button>
+              </form>
+            </div>
+          @endif
 
-         <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
-           <article class="post-item d-flex">
-             <div class="post-img">
-               <img src="{{ asset($articles[1]->thumbnail) }}" alt="">
-             </div>
+        </div>
+      </article>
+    </div>
+    @endif
 
-             <div class="post-content flex-grow-1">
-               <p class="category">{{ $articles[1]->category }}</p>
-               <h2 class="post-title">
-                  <a href="{{ route('articles.show', $articles[1]->slug) }}">
-                      {{ $articles[1]->title }}
-                  </a>
-              </h2>
+    <!-- ARTYKUŁ 2 -->
+    @if(isset($articles[1]))
+    <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
+      <article class="post-item d-flex">
+        <div class="post-img">
+          <img src="{{ asset($articles[1]->thumbnail) }}" alt="">
+        </div>
 
-               <p class="post-description">
-                {{ $articles[1]->description }}
-               </p>
+        <div class="post-content flex-grow-1">
+          <p class="category">{{ $articles[1]->category }}</p>
+          <h2 class="post-title">
+             <a href="{{ route('articles.show', $articles[1]->slug) }}">
+                 {{ $articles[1]->title }}
+             </a>
+         </h2>
 
-               <div class="post-meta">
-                 <span class="post-date">{{ Carbon::parse($articles[1]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
-               </div>
-             </div>
-           </article>
-         </div><!-- End post item -->
-         <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
-           <article class="post-item d-flex">
-             <div class="post-img">
-               <img src="{{ asset($articles[2]->thumbnail) }}" alt="">
-             </div>
+          <p class="post-description">
+           {{ $articles[1]->description }}
+          </p>
 
-             <div class="post-content flex-grow-1">
-               <p class="category">{{ $articles[2]->category }}</p>
-               <h2 class="post-title">
-                  <a href="{{ route('articles.show', $articles[2]->slug) }}">
-                      {{ $articles[2]->title }}
-                  </a>
-              </h2>
+          <div class="post-meta">
+            <span class="post-date">{{ Carbon::parse($articles[1]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
+          </div>
 
-               <p class="post-description">
-                {{ $articles[2]->description }}
-               </p>
+          @if(auth()->check() && auth()->user()->hasMinRole('editor'))
+            <div class="mt-2 pt-2 border-top d-flex gap-2">
+              <a href="{{ route('articles.edit', $articles[1]->slug) }}" class="btn btn-sm btn-warning">
+                Edytuj
+              </a>
+              <form action="{{ route('articles.destroy', $articles[1]->slug) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć ten artykuł?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger">
+                  Usuń
+                </button>
+              </form>
+            </div>
+          @endif
 
-               <div class="post-meta">
-                 <span class="post-date">{{ Carbon::parse($articles[2]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
-               </div>
-             </div>
-           </article>
-         </div><!-- End post item -->
+        </div>
+      </article>
+    </div>
+    @endif
 
-         <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
-           <article class="post-item d-flex">
-             <div class="post-img">
-               <img src="{{ asset($articles[3]->thumbnail) }}" alt="">
-             </div>
+    <!-- ARTYKUŁ 3 -->
+    @if(isset($articles[2]))
+    <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
+      <article class="post-item d-flex">
+        <div class="post-img">
+          <img src="{{ asset($articles[2]->thumbnail) }}" alt="">
+        </div>
 
-             <div class="post-content flex-grow-1">
-               <p class="category">{{ $articles[3]->category }}</p>
-               <h2 class="post-title">
-                  <a href="{{ route('articles.show', $articles[3]->slug) }}">
-                      {{ $articles[3]->title }}
-                  </a>
-              </h2>
+        <div class="post-content flex-grow-1">
+          <p class="category">{{ $articles[2]->category }}</p>
+          <h2 class="post-title">
+             <a href="{{ route('articles.show', $articles[2]->slug) }}">
+                 {{ $articles[2]->title }}
+             </a>
+         </h2>
 
-               <p class="post-description">
-                {{ $articles[3]->description }}
-               </p>
+          <p class="post-description">
+           {{ $articles[2]->description }}
+          </p>
 
-               <div class="post-meta">
-                 <span class="post-date">{{ Carbon::parse($articles[3]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
-               </div>
-             </div>
-           </article>
-         </div><!-- End post item -->
+          <div class="post-meta">
+            <span class="post-date">{{ Carbon::parse($articles[2]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
+          </div>
 
-      <a href="{{ route('articles') }}" class="btn btn-primary mt-4">Zobacz wszystkie aktualności</a>
+          @if(auth()->check() && auth()->user()->hasMinRole('editor'))
+            <div class="mt-2 pt-2 border-top d-flex gap-2">
+              <a href="{{ route('articles.edit', $articles[2]->slug) }}" class="btn btn-sm btn-warning">
+                Edytuj
+              </a>
+              <form action="{{ route('articles.destroy', $articles[2]->slug) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć ten artykuł?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger">
+                  Usuń
+                </button>
+              </form>
+            </div>
+          @endif
 
-       </div>
+        </div>
+      </article>
+    </div>
+    @endif
 
-     </div>
+    <!-- ARTYKUŁ 4 -->
+    @if(isset($articles[3]))
+    <div class="col-xl-6" data-aos="fade-up" data-aos-delay="100">
+      <article class="post-item d-flex">
+        <div class="post-img">
+          <img src="{{ asset($articles[3]->thumbnail) }}" alt="">
+        </div>
+
+        <div class="post-content flex-grow-1">
+          <p class="category">{{ $articles[3]->category }}</p>
+          <h2 class="post-title">
+             <a href="{{ route('articles.show', $articles[3]->slug) }}">
+                 {{ $articles[3]->title }}
+             </a>
+         </h2>
+
+          <p class="post-description">
+           {{ $articles[3]->description }}
+          </p>
+
+          <div class="post-meta">
+            <span class="post-date">{{ Carbon::parse($articles[3]->updated_at)->locale('pl')->translatedFormat('d M Y H:i') }}</span>
+          </div>
+
+          @if(auth()->check() && auth()->user()->hasMinRole('editor'))
+            <div class="mt-2 pt-2 border-top d-flex gap-2">
+              <a href="{{ route('articles.edit', $articles[3]->slug) }}" class="btn btn-sm btn-warning">
+                Edytuj
+              </a>
+              <form action="{{ route('articles.destroy', $articles[3]->slug) }}" method="POST" onsubmit="return confirm('Czy na pewno chcesz usunąć ten artykuł?');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn btn-sm btn-danger">
+                  Usuń
+                </button>
+              </form>
+            </div>
+          @endif
+
+        </div>
+      </article>
+    </div>
+    @endif
+
+ 
+
+   <a href="{{ route('articles') }}" class="btn btn-primary mt-4">Zobacz wszystkie aktualności</a>
+
+@if(auth()->check() && auth()->user()->hasMinRole('editor'))
+
+<a href="{{ route('add-article') }}" class="btn btn-success">
+
++ Dodaj artykuł
+
+</a>
+
+@endif
+ </div>
+
+
+</div>
 
    </section><!-- /Recent News Section -->
    

@@ -72,6 +72,23 @@
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
     </div>
+    @auth
+    <div class="user-nav-info style-inline d-flex align-items-center gap-3">
+        <!-- Nazwa użytkownika i rola -->
+        <span class="user-details" style="color: #000 ; font-weight: bold;">
+            Zalogowano jako: <strong>{{ auth()->user()->name }}</strong> 
+            <small class="text-muted">({{ auth()->user()->role }})</small>
+        </span>
+
+        <!-- Przycisk wylogowania -->
+        <form action="{{ route('logout') }}" method="POST" class="d-inline">
+            @csrf
+            <button type="submit" class="btn btn-sm btn-outline-danger">
+                Wyloguj się
+            </button>
+        </form>
+    </div>
+@endauth
 
   </div>
 </header>
