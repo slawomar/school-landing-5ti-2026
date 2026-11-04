@@ -61,6 +61,18 @@
   <script src="{{ asset('college/assets/js/main.js') }}"></script>
 
   @stack('scripts')
+  @auth
+    <!-- Ukryty formularz wylogowania -->
+    <form id="auto-logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+        @csrf
+    </form>
+
+    <script>
+        setTimeout(function() {
+            document.getElementById('auto-logout-form').submit();
+        }, 3600000);
+    </script>
+@endauth
 </body>
 
 </html>

@@ -73,16 +73,17 @@
         </ul>
     </div>
 
-    @if(auth()->check() && auth()->user()->hasMinRole('editor'))
+    
+
+    <div class="d-flex justify-content-center my-5">
+        @if(auth()->check() && auth()->user()->hasMinRole('editor'))
         <div class="mb-4 text-end">
             <a href="{{ route('gallery.create') }}" class="btn btn-success">
                 + Dodaj nowy album
             </a>
         </div>
     @endif
-
-    <div class="d-flex justify-content-center my-5">
-        <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
+        <a href="{{ route('home') }}" class="btn btn-outline-secondary px-4 py-2">
             &leftarrow; Powrót
         </a>
     </div>

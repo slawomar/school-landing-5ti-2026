@@ -1,202 +1,113 @@
 @extends('layouts.public')
 
 @section('title', 'Rekrutacja')
-
 @section('body_class', 'recruitment-page')
 
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<style>
+   /* Style trybu edycji */
+.admin-edit-active .draggable-zone {
+    border: 2px dashed #cbd5e1 !important;
+    padding: 15px !important;
+    margin-bottom: 20px !important;
+    border-radius: 12px !important;
+    position: relative !important;
+    min-height: 80px;
+}
+
+.admin-edit-active .draggable-block {
+    position: relative !important;
+    border: 1px dashed #0d6efd !important;
+    margin-bottom: 10px !important;
+    border-radius: 8px !important;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+/* Styl dla elementów przeciąganych w trakcie ruchu */
+.sortable-ghost {
+    opacity: 0.4 !important;
+    background-color: #e2e8f0 !important;
+    border: 2px dashed #0d6efd !important;
+}
+
+.sortable-chosen {
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2) !important;
+}
+
+/* Pasek narzędziowy przy bloku */
+.block-toolbar {
+    display: none;
+    position: absolute;
+    top: -14px;
+    right: 10px;
+    z-index: 1050;
+    background: #ffffff;
+    border: 1px solid #0d6efd;
+    border-radius: 20px;
+    padding: 2px 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.admin-edit-active .draggable-block:hover > .block-toolbar,
+.admin-edit-active .draggable-zone:hover > .block-toolbar {
+    display: flex;
+    gap: 4px;
+}
+
+.drag-handle { cursor: grab; }
+.drag-handle:active { cursor: grabbing; }
+
+/* Styl usprawniający zmiane rozmiaru tekstu/obrazu w TinyMCE */
+.admin-edit-active .page-section {
+    outline: 1px dashed #94a3b8;
+    padding: 8px;
+    border-radius: 6px;
+}
+</style>
+
 <main class="main py-5 bg-light">
     <div class="container">
-        
-        <header class="text-center mb-5">
-            <h1 class="display-5 fw-bold text-primary mb-3">Rekrutacja do Zespołu Szkół w Czernikowie</h1>
-            <p class="lead text-muted">Rok szkolny 2026/2027</p>
-            
-            <div class="my-4">
-                <img src="{{ asset('college/assets/img/education/BANER BT_2026_FB.png') }}" 
-                     alt="Rekrutacja" 
-                     class="img-fluid rounded-4 shadow-sm hero-image" 
-                     style="max-height: 400px; width: auto; object-fit: cover;">
+
+        {{-- Pasek Administratora --}}
+        @auth
+            @if(auth()->user()->hasMinRole('admin'))
+                <div class="alert alert-warning d-flex justify-content-between align-items-center mb-4 shadow-sm rounded-4 sticky-top" style="z-index: 10000; top: 10px;">
+                    <span><i class="bi bi-shield-lock-fill me-2"></i><strong>Tryb Edycji:</strong> Możesz edytować teksty, przeciągać bloki myszką (Drag & Drop) oraz wgrywać pliki.</span>
+                    <button type="button" id="toggle-edit-btn" class="btn btn-primary fw-bold px-4">
+                        <i class="bi bi-pencil-square me-2"></i>Włącz edycję strony
+                    </button>
+                </div>
+            @endif
+        @endauth
+
+        {{-- Ukryty input do wgrywania plików z komputera --}}
+        <input type="file" id="global-file-input" style="display: none;" accept=".pdf,.doc,.docx,.xls,.xlsx,.zip">
+
+        <form action="{{ route('pages.update') }}" method="POST" id="recruitment-form">
+            @csrf
+            @method('PUT')
+
+            <textarea name="content" id="hidden-content" style="display: none;"></textarea>
+
+            {{-- DYNAMICZNA TREŚĆ WCZYTYWANA Z STORAGE --}}
+            <div id="main-sortable-container" class="draggable-zone">
+                {!! $content !!}
             </div>
 
-            <div class="d-flex justify-content-center gap-3 flex-wrap my-4">
-                <a href="{{ asset('college/assets/uploads/REGULAMIN REKRUTACJI NA ROK SZKOLNY 2025 2026.pdf') }}" 
-                   class="btn btn-primary btn-lg shadow-sm" 
-                   target="_blank">
-                   <i class="bi bi-file-earmark-pdf me-2"></i>Regulamin Rekrutacji
-                </a>
-            </div>
-        </header>
-
-        <div class="row g-4 mb-5">
-            
-            <div class="col-lg-6">
-                <div class="card h-100 border-0 shadow-sm rounded-4">
-                    <div class="card-body p-4">
-                        <h2 class="h4 card-title text-primary fw-bold mb-4">
-                            <i class="bi bi-mortarboard-fill me-2"></i>Kierunki kształcenia
-                        </h2>
-                        <ul class="list-group list-group-flush">
-                            <li class="list-group-item bg-transparent ps-0 border-0 py-2">
-                                <strong class="text-dark">Technik informatyk / technik programista</strong>
-                            </li>
-                            <li class="list-group-item bg-transparent ps-0 border-0 py-2">
-                                <strong class="text-dark">Technik logistyk z przygotowaniem wojskowym</strong>
-                            </li>
-                            <li class="list-group-item bg-transparent ps-0 border-0 py-2">
-                                <strong class="text-dark">Liceum Ogólnokształcące — profil social media</strong>
-                            </li>
-                            <li class="list-group-item bg-transparent ps-0 border-0 py-2">
-                                <strong class="text-dark">Branżowa Szkoła I Stopnia</strong>
-                            </li>
-                        </ul>
+            {{-- PRZYCISK ZAPISU --}}
+            @auth
+                @if(auth()->user()->hasMinRole('admin'))
+                    <div id="save-bar" class="text-center my-4" style="display: none;">
+                        <button type="submit" id="save-btn" class="btn btn-success btn-lg px-5 shadow rounded-pill">
+                            <i class="bi bi-check-circle-fill me-2"></i>Zapisz zmiany na stronie
+                        </button>
                     </div>
-                </div>
-            </div>
+                @endif
+            @endauth
 
-            <div class="col-lg-6">
-                <div class="card h-100 border-0 shadow-sm rounded-4 border-start border-4 border-danger">
-                    <div class="card-body p-4">
-                        <h2 class="h4 card-title text-danger fw-bold mb-3">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i>Ważne informacje
-                        </h2>
-                        <div class="alert alert-warning border-0 rounded-3 mb-3">
-                            <strong>Do 12.07.2026 r.</strong> prosimy o dostarczenie brakujących dokumentów:
-                            <small class="d-block text-muted mt-1">Oryginał świadectwa, zaświadczenie OKE, zaświadczenie od lekarza medycyny pracy, zdjęcia, opinia/orzeczenie.</small>
-                        </div>
-                        <div class="p-3 bg-light rounded-3 text-center border">
-                            <span class="text-uppercase small text-muted d-block">Ogłoszenie listy przyjętych</span>
-                            <strong class="h5 text-danger mb-0">20 lipca 2026 r. o godz. 12:00</strong>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <section class="card border-0 shadow-sm rounded-4 p-4 mb-5">
-            <h2 class="h4 fw-bold text-dark mb-4">
-                <i class="bi bi-download me-2 text-primary"></i>Dokumenty i formularze do pobrania
-            </h2>
-            <div class="row g-3">
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ asset('college/assets/uploads/wniosek do szkoły LBT 2026.pdf') }}" class="btn btn-light w-100 text-start border p-3 d-flex align-items-center rounded-3">
-                        <i class="bi bi-file-pdf fs-3 text-danger me-3"></i>
-                        <div>
-                            <div class="fw-bold">Formularz rekrutacyjny</div>
-                            <small class="text-muted">Wersja PDF</small>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ asset('college/assets/uploads/wniosek do szkoły LBT 2026.docx') }}" class="btn btn-light w-100 text-start border p-3 d-flex align-items-center rounded-3">
-                        <i class="bi bi-file-word fs-3 text-primary me-3"></i>
-                        <div>
-                            <div class="fw-bold">Formularz rekrutacyjny</div>
-                            <small class="text-muted">Wersja DOCX</small>
-                        </div>
-                    </a>
-                </div>
-                <div class="col-md-6 col-lg-4">
-                    <a href="{{ asset('college/assets/uploads/zaswiadczenie o przyjecie na praktyki 2026.pdf') }}" class="btn btn-light w-100 text-start border p-3 d-flex align-items-center rounded-3">
-                        <i class="bi bi-file-earmark-check fs-3 text-success me-3"></i>
-                        <div>
-                            <div class="fw-bold">Zaświadczenie od pracodawcy</div>
-                            <small class="text-muted">Dotyczy Szkoły Branżowej</small>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            
-            <div class="alert alert-info border-0 mt-4 mb-0 d-flex align-items-center rounded-3">
-                <i class="bi bi-info-circle-fill me-3 fs-4"></i>
-                <div>
-                    <strong>Uwaga dla uczniów Technikum i Szkoły Branżowej:</strong> Skierowania na badania lekarskie są do pobrania w sekretariacie szkoły.
-                </div>
-            </div>
-        </section>
-
-        <section class="card border-0 shadow-sm rounded-4 p-4 mb-5">
-            <h2 class="h4 fw-bold text-dark mb-4 text-center">Terminy postępowania rekrutacyjnego na rok szkolny 2026/2027</h2>
-            
-            <div class="table-responsive">
-                <table class="table table-hover align-middle">
-                    <thead class="table-primary">
-                        <tr>
-                            <th scope="col" style="width: 50px;">#</th>
-                            <th scope="col">Etap rekrutacji</th>
-                            <th scope="col" style="width: 250px;">Termin</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td class="fw-bold">1</td>
-                            <td>Złożenie wniosku o przyjęcie do klasy pierwszej.</td>
-                            <td><span class="badge bg-light text-dark border">11.05.2026 - 12.06.2026</span> <br><small class="text-muted">do godz. 15:00</small></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">2</td>
-                            <td>Złożenie świadectwa ukończenia szkoły podstawowej oraz zaświadczenia o wynikach egzaminu.</td>
-                            <td><span class="badge bg-light text-dark border">23.06.2026 - 07.07.2026</span> <br><small class="text-muted">do godz. 15:00</small></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">3</td>
-                            <td>Weryfikacja wniosków o przyjęcie do klasy pierwszej.</td>
-                            <td><span class="badge bg-light text-dark border">do 13.07.2026</span></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">4</td>
-                            <td>Podanie do publicznej wiadomości listy kandydatów zakwalifikowanych i niezakwalifikowanych.</td>
-                            <td><strong class="text-primary">14.07.2026</strong> <br><small class="text-muted">do godz. 12:00</small></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">5</td>
-                            <td>Wydanie skierowań na badania lekarskie (Technikum i Branżowa Szkoła I st.).</td>
-                            <td><span class="badge bg-light text-dark border">11.05.2026 - 15.07.2026</span></td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold">6</td>
-                            <td><strong>Przedłożenie oryginału świadectwa ukończenia szkoły podstawowej i zaświadczenia OKE.</strong></td>
-                            <td><strong class="text-primary">do 17.07.2026</strong> <br><small class="text-muted">do godz. 15:00</small></td>
-                        </tr>
-                        <tr class="table-success">
-                            <td class="fw-bold">7</td>
-                            <td><strong>Podanie do publicznej wiadomości listy przyjętych do klas pierwszych.</strong></td>
-                            <td><strong class="text-success fs-6">20.07.2026</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="row g-3 mt-3 text-center">
-                <div class="col-md-6">
-                    <div class="p-3 bg-light rounded-3">
-                        <i class="bi bi-envelope-at text-primary me-2"></i>
-                        Wnioski elektroniczne: <a href="mailto:zs@czernikowo.pl" class="fw-bold text-decoration-none">zs@czernikowo.pl</a>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="p-3 bg-light rounded-3">
-                        <i class="bi bi-telephone text-primary me-2"></i>
-                        Telefon kontaktowy: <a href="tel:690591321" class="fw-bold text-decoration-none">690 591 321</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="card border-0 shadow-sm rounded-4 p-4 mb-5">
-            <h2 class="h4 fw-bold text-dark mb-3">Niezbędne dokumenty załączane do wniosku:</h2>
-            <ol class="list-group list-group-numbered list-group-flush">
-                <li class="list-group-item bg-transparent border-0 py-2">Świadectwo ukończenia Szkoły Podstawowej</li>
-                <li class="list-group-item bg-transparent border-0 py-2">Zaświadczenie OKE</li>
-                <li class="list-group-item bg-transparent border-0 py-2">Zaświadczenie od pracodawcy o przyjęciu na praktyki <em>(dotyczy Szkoły Branżowej)</em></li>
-                <li class="list-group-item bg-transparent border-0 py-2">Dokumenty potwierdzające sukcesy sportowe, artystyczne itp.</li>
-                <li class="list-group-item bg-transparent border-0 py-2">Jedna podpisana fotografia</li>
-                <li class="list-group-item bg-transparent border-0 py-2">Zaświadczenie lekarskie o braku przeciwwskazań zdrowotnych <em>(dostarczane po zakwalifikowaniu — Technikum i Szkoła Branżowa)</em></li>
-                <li class="list-group-item bg-transparent border-0 py-2">Karta zdrowia</li>
-                <li class="list-group-item bg-transparent border-0 py-2">Orzeczenie o potrzebie kształcenia specjalnego lub orzeczenie o niepełnosprawności <em>(jeśli dotyczy)</em></li>
-            </ol>
-        </section>
+        </form>
 
         <div class="text-center mt-5">
             <img src="{{ asset('college/assets/img/logo_BT_firmowy-papier.png') }}" alt="Logo ZS Czernikowo" height="80" class="img-fluid opacity-75">
@@ -204,4 +115,205 @@
 
     </div>
 </main>
+
+{{-- SKRYPT ZARZĄDZANIA EDYCJĄ I DRAG & DROP --}}
+@auth
+    @if(auth()->user()->hasMinRole('admin'))
+        <script src="https://cdn.jsdelivr.net/npm/tinymce@6/tinymce.min.js"></script>
+        <script>
+           document.addEventListener("DOMContentLoaded", function() {
+    const btnToggle = document.getElementById('toggle-edit-btn');
+    const form = document.getElementById('recruitment-form');
+    const fileInput = document.getElementById('global-file-input');
+    let activeTargetWrapper = null;
+    let sortableInstances = [];
+
+    if (btnToggle) {
+        btnToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            document.body.classList.toggle('admin-edit-active');
+            const isActive = document.body.classList.contains('admin-edit-active');
+
+            // Blokowanie otwierania linków podczas edycji
+            document.querySelectorAll('.file-link-element').forEach(a => {
+                if (isActive) {
+                    a.addEventListener('click', preventLinkClick);
+                } else {
+                    a.removeEventListener('click', preventLinkClick);
+                }
+            });
+
+            if (isActive) {
+                // 1. Główny kontener - do przesuwania dużych sekcji (pionowo)
+                const mainContainer = document.getElementById('main-sortable-container');
+                if(mainContainer) {
+                    sortableInstances.push(new Sortable(mainContainer, {
+                        animation: 150,
+                        handle: '.drag-handle',
+                        draggable: '> .draggable-block',
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen'
+                    }));
+                }
+
+                // 2. Wewnętrzne strefy (np. rządki z przyciskami PDF/Word/Excel)
+                document.querySelectorAll('.inner-sortable-zone').forEach(zone => {
+                    sortableInstances.push(new Sortable(zone, {
+                        group: {
+                            name: 'shared-files',
+                            pull: true,  // Zezwalaj na wyciąganie
+                            put: true    // Zezwalaj na wkładanie
+                        },
+                        animation: 150,
+                        handle: '.drag-handle',
+                        draggable: '.draggable-block',
+                        ghostClass: 'sortable-ghost',
+                        chosenClass: 'sortable-chosen',
+                        // Pozwala na przeciąganie w poziomie (lewo/prawo)
+                        direction: 'horizontal', 
+                        fallbackOnBody: true,
+                        swapThreshold: 0.65
+                    }));
+                });
+
+                // 3. Włączenie edytora tekstu TinyMCE dla sekcji tekstowych
+                tinymce.init({
+                    selector: '.page-section',
+                    inline: true,
+                    language: 'pl',
+                    plugins: 'link table code lists image media resizable',
+                    toolbar: 'undo redo | blocks | bold italic forecolor | alignleft aligncenter alignright | bullist numlist | table image | code',
+                    extended_valid_elements: 'div[*],span[*],a[*],i[*],img[*]',
+                    image_advtab: true
+                });
+
+                document.getElementById('save-bar').style.display = 'block';
+                this.innerText = 'Wyłącz tryb edycji';
+                this.classList.remove('btn-primary');
+                this.classList.add('btn-outline-danger');
+            } else {
+                // Wyłączanie edycji
+                tinymce.remove();
+                sortableInstances.forEach(instance => instance.destroy());
+                sortableInstances = [];
+
+                document.getElementById('save-bar').style.display = 'none';
+                this.innerText = 'Włącz edycję strony';
+                this.classList.remove('btn-outline-danger');
+                this.classList.add('btn-primary');
+            }
+        });
+    }
+
+    function preventLinkClick(e) { e.preventDefault(); }
+
+    // globalny nasłuchiwacz zdarzeń (kliknięcia w przyciski usuwania i podmieniania plików)
+    document.addEventListener('click', function(e) {
+        // Podmiana pliku
+        const uploadBtn = e.target.closest('.btn-upload-file');
+        if (uploadBtn) {
+            e.preventDefault();
+            activeTargetWrapper = uploadBtn.closest('.file-editable-wrapper');
+            fileInput.click();
+        }
+
+        // Usuwanie wybranego pliku lub sekcji
+        const deleteBtn = e.target.closest('.btn-delete-block');
+        if (deleteBtn) {
+            e.preventDefault();
+            e.stopPropagation(); // Blokuje propagację zdarzenia
+            
+            const targetBlock = deleteBtn.closest('.draggable-block');
+            if (targetBlock && confirm('Czy na pewno chcesz usunąć ten element?')) {
+                targetBlock.remove();
+            }
+        }
+    });
+
+    // Obsługa wczytywania nowego pliku
+    fileInput.addEventListener('change', function() {
+        if (this.files.length === 0 || !activeTargetWrapper) return;
+
+        const file = this.files[0];
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('_token', '{{ csrf_token() }}');
+
+        fetch('{{ route("pages.upload_file") }}', {
+            method: 'POST',
+            body: formData,
+            headers: { 'X-Requested-With': 'XMLHttpRequest' }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const linkElement = activeTargetWrapper.querySelector('.file-link-element');
+                if (linkElement) {
+                    linkElement.setAttribute('href', data.url);
+                    alert('Plik został podmieniony!');
+                }
+            } else {
+                alert(data.message || 'Błąd wgrywania pliku.');
+            }
+        })
+        .catch(error => alert('Wystąpił błąd serwera podczas wgrywania.'));
+    });
+
+    // Zapis do serwera (wysyłka JSON / Fetch)
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const clone = document.getElementById('main-sortable-container').cloneNode(true);
+            
+            // Czyszczenie narzędzi i stylów trybu edytora przed zapisem HTML do bazy/Storage
+            clone.querySelectorAll('.block-toolbar').forEach(el => el.remove());
+            clone.querySelectorAll('.draggable-block').forEach(el => el.classList.remove('draggable-block'));
+            clone.querySelectorAll('.draggable-zone').forEach(el => el.classList.remove('draggable-zone'));
+            clone.querySelectorAll('.inner-sortable-zone').forEach(el => el.classList.remove('inner-sortable-zone'));
+            clone.querySelectorAll('.mce-content-body').forEach(el => {
+                el.removeAttribute('contenteditable');
+                el.removeAttribute('spellcheck');
+                el.classList.remove('mce-content-body', 'mce-edit-focus');
+            });
+
+            const htmlContent = clone.innerHTML;
+
+            fetch('{{ route("pages.update") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    _method: 'PUT',
+                    content: htmlContent
+                })
+            })
+            .then(response => response.json().then(data => ({ status: response.status, body: data })))
+            .then(res => {
+                if (res.status === 403) {
+                    alert('Błąd 403: Brak uprawnień do zapisu.');
+                    return;
+                }
+                if (res.body && res.body.success) {
+                    alert('Strona została zaktualizowana!');
+                    window.location.reload();
+                } else {
+                    alert(res.body.message || 'Błąd podczas zapisu.');
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert('Błąd połączenia z serwerem.');
+            });
+        });
+    }
+});
+        </script>
+    @endif
+@endauth
 @endsection
