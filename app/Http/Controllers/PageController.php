@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PageController extends Controller
 {
-    // 1. Wyświetlanie strony rekrutacji
     public function showRecruitment()
     {
         $filePath = 'editable_pages/recruitment.html';
@@ -21,10 +20,8 @@ class PageController extends Controller
         ]);
     }
 
-    // 2. Zapisywanie zmodyfikowanej treści strony (wykorzystuje Twoją metodę hasMinRole)
     public function updatePage(Request $request)
     {
-        // Sprawdzanie uprawnień za pomocą Twojej metody
         if (!auth()->check() || !auth()->user()->hasMinRole('admin')) {
             return response()->json([
                 'success' => false, 
@@ -41,7 +38,6 @@ class PageController extends Controller
             ], 422);
         }
 
-        // Zapis do pliku storage/app/editable_pages/recruitment.html
         Storage::put('editable_pages/recruitment.html', $content);
 
         if ($request->wantsJson() || $request->ajax()) {
@@ -54,7 +50,6 @@ class PageController extends Controller
         return back()->with('success', 'Zapisano zmiany!');
     }
 
-    // 3. Wgrywanie plików z urządzenia
     public function uploadFile(Request $request)
     {
         if (!auth()->check() || !auth()->user()->hasMinRole('admin')) {
@@ -65,7 +60,7 @@ class PageController extends Controller
         }
 
         $request->validate([
-            'file' => 'required|file|max:20480', // max 20MB
+            'file' => 'required|file|max:20480',
         ]);
 
         if ($request->hasFile('file')) {

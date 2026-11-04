@@ -5,7 +5,10 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SetPasswordMail;
 
 class UserController extends Controller
 {
@@ -29,6 +32,18 @@ class UserController extends Controller
 
         return view('pages.users.create');
     }
+// Metoda obsługująca KLIKNIĘCIE W LINK Z MAILA przez nowego użytkownika
+public function showSetPasswordForm(Request $request, string $token)
+{
+    return view('pages.reset-password', [
+        'token' => $token,
+        'email' => $request->email
+    ]);
+}
+
+    private function getRandomString($n) {
+    return bin2hex(random_bytes($n / 2));
+    }
 
     // Zapis nowego użytkownika
     public function store(Request $request)
@@ -40,21 +55,25 @@ class UserController extends Controller
     $data = $request->validate([
         'name'     => 'required|string|max:255',
         'email'    => 'required|email|unique:users,email',
-        'password' => 'required|min:8',
         'role'     => 'required|string',
     ]);
 
     // Zapis bezpośrednio do bazy danych (jak w artykułach)
-    DB::table('users')->insert([
+    $user = User::create([
         'name'       => $data['name'],
         'email'      => $data['email'],
-        'password'   => Hash::make($data['password']),
+        'password' => Hash::make($this->getRandomString(12)), // Tymczasowe hasło
         'role'       => $data['role'],
         'created_at' => now(),
         'updated_at' => now(),
     ]);
 
-    return redirect()->route('users.index')->with('success', 'Użytkownik został dodany.');
+    $token = Password::broker()->createToken($user);
+
+    // 4. Wysłanie maila przy użyciu Resenda
+    Mail::to($user->email)->send(new SetPasswordMail($user, $token));
+
+    return redirect()->route('users.index')->with('success', 'Użytkownik został utworzony, a na jego adres e-mail wysłano link do ustawienia hasła.');
 }
 
     // Formularz edycji
@@ -65,6 +84,28 @@ class UserController extends Controller
         }
 
         return view('pages.users.edit', compact('user'));
+    }
+    public function newPassword(Request $request)
+    {
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user || !Password::broker()->tokenExists($user, $request->token)) {
+            return redirect()->back()->with('error', 'Nieprawidłowy token resetowania hasła.');
+        }
+
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        Password::broker()->deleteToken($user);
+
+        return redirect()->route('login')->with('success', 'Hasło zostało pomyślnie zresetowane.');
     }
 
     // Zapis edycji użytkownika
