@@ -39,7 +39,7 @@
     </div>
 
     <div class="d-flex justify-content-center my-5">
-      <a href="javascript:history.back()" class="btn btn-outline-secondary px-4 py-2">
+      <a href="{{ route('gallery') }}" class="btn btn-outline-secondary px-4 py-2">
         &leftarrow; Powrót
       </a>
     </div>

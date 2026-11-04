@@ -10,7 +10,7 @@ class LoginController extends Controller
 {
     public function showLoginForm()
     {
-        return view('pages.login'); // Tutaj podaj ścieżkę do swojego widoku z formularzem
+        return view('pages.login');
     }
 
     public function login(Request $request)
@@ -22,8 +22,9 @@ class LoginController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
+            session(['logged_in_at' => now()->timestamp]);
 
-            return redirect()->route('pages.home')
+            return redirect()->route('home')
                 ->with('success', 'Zostałeś pomyślnie zalogowany!');
         }
 
@@ -32,16 +33,13 @@ class LoginController extends Controller
         ])->onlyInput('email');
     }
 
-// Dodaj tę metodę do klasy LoginController
 public function logout(Request $request)
 {
     Auth::logout();
 
-    // Unieważnij sesję i wygeneruj nowy token CSRF dla bezpieczeństwa
     $request->session()->invalidate();
     $request->session()->regenerateToken();
 
-    // Przekieruj na stronę główną z komunikatem
-    return redirect('/')->with('success', 'Pomyślnie wylogowano.');
+    return redirect()->route('home')->with('success', 'Pomyślnie wylogowano.');
 }
 }

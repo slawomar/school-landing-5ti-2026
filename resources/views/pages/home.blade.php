@@ -28,7 +28,6 @@
               <h5>Branżowa Szkoła I stopnia im. M. Kopernika</h5>
              <br>
              <div class="action-buttons">
-               <a href="{{ route('recruitment') }}" class="btn-primary">Rekrutacja 2026/27</a>
                <a href="#" class="btn-secondary">Kalendarium</a>
              </div>
            </div>
@@ -424,5 +423,6 @@
      </div>
    </div>
 </main>
+
  
 @endsection

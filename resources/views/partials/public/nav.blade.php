@@ -17,6 +17,7 @@
         {{-- <img src="{{ asset('college/assets/img/logo.webp') }}" alt=""> --}}
         <h1 class="sitename">Plan lekcji</h1>
       </a>
+      
 
       
     </div>
@@ -34,6 +35,7 @@
               <li><a href="#">Baza dydaktyczna</a></li>
               <li><a href="#">Dokumenty</a></li>
               <li><a href="#">Sport &amp; UKS Kopernik</a></li>
+              
             </ul>
           </li>
 
@@ -68,6 +70,9 @@
             </ul>
           </li>
           <li><a href="{{ route('contact') }}">Kontakt</a></li>
+          @if(auth()->check() && auth()->user()->hasMinRole('admin'))
+              <li><a href="{{ route('users.index') }}">Zarządzaj użytkownikami</a></li>
+              @endif
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
